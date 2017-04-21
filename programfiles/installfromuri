@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Tests the pre requisites
+if ! which udownload > /dev/null 2>&1; then
+    echo You needs the \"udownload\" utility to run.
+    echo Get it from https://raw.githubusercontent.com/danilocgsilva/universal_download/master/programfiles/udownload
+    exit.
+fi
+
+if [ -z $1 ]; then
+    echo It needs the first parameter to be the uri to download.
+    exit
+fi
+
