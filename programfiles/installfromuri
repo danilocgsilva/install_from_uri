@@ -7,8 +7,37 @@ if ! which udownload > /dev/null 2>&1; then
     exit.
 fi
 
+
+# Check if the first argument was provided
 if [ -z $1 ]; then
     echo It needs the first parameter to be the uri to download.
     exit
 fi
 
+# Check if the target directory exists
+if ! [ -d /usr/local/bin ]; then
+  echo Unix system needs the /usr/local/bin to put the downloaded file, but it seems that this directory not exists.
+  echo exiting...
+  exit 1
+fi
+
+# Check if there are permission to write in the /usr/local/bin
+if ! [ -w /usr/local/bin ]; then
+  echo There\'s no permission to write to the /usr/local/bin. Maybe execute the script as super user works.
+  echo exiting...
+  exit 1
+fi
+
+date=$(date +%Y%m%d-%Hh%Mm%Ss)
+tmp_folder=tmp_installfromuri-$date
+cd /tmp
+mkdir $tmp_folder
+cd $tmp_folder
+udownload $1
+if [ $? -ne 0 ]; then
+  echo Download failed. Check for internet connection or if the uri resource exists.
+  echo exiting...
+  exit
+fi
+file=$(ls)
+cp $file /usr/local/bin
