@@ -1,11 +1,28 @@
 #!/bin/bash
 
-# Tests the pre requisites
-if ! which udownload > /dev/null 2>&1; then
-    echo You needs the \"udownload\" utility to run.
-    echo Get it from https://raw.githubusercontent.com/danilocgsilva/universal_download/master/programfiles/udownload
-    exit.
-fi
+# # Tests the pre requisites
+# if ! which udownload > /dev/null 2>&1; then
+#     echo You needs the \"udownload\" utility to run.
+#     echo Get it from https://raw.githubusercontent.com/danilocgsilva/universal_download/master/programfiles/udownload
+#     exit.
+# fi
+
+# Function definition
+local_universal_download() {
+  if [ -z $1 ]; then
+    echo Please, provides the first argument to be the resource address.
+    exit
+  fi
+
+  if which wget > /dev/null 2>&1 ; then
+      wget $1
+  elif which curl > /dev/null; then
+      curl -O $1
+  else
+      echo Neither wget or curl are installed in the system. Can not download. Installs one of those.
+      exit
+  fi
+}
 
 
 # Check if the first argument was provided
@@ -33,7 +50,7 @@ tmp_folder=tmp_installfromuri-$date
 cd /tmp
 mkdir $tmp_folder
 cd $tmp_folder
-udownload $1
+local_universal_download $1
 if [ $? -ne 0 ]; then
   echo Download failed. Check for internet connection or if the uri resource exists.
   echo exiting...
