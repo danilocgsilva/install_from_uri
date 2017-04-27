@@ -45,6 +45,8 @@ if ! [ -w /usr/local/bin ]; then
   exit 1
 fi
 
+
+## Starts the script jobs
 date=$(date +%Y%m%d-%Hh%Mm%Ss)
 tmp_folder=tmp_installfromuri-$date
 cd /tmp
@@ -58,3 +60,4 @@ if [ $? -ne 0 ]; then
 fi
 file=$(ls)
 cp $file /usr/local/bin
+echo Installed successfully.
