@@ -59,5 +59,6 @@ if [ $? -ne 0 ]; then
   exit
 fi
 file=$(ls)
+chmod +x $file
 cp $file /usr/local/bin
 echo Installed successfully.
