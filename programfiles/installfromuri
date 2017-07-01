@@ -1,22 +1,19 @@
 #!/bin/bash
 
-# # Tests the pre requisites
-# if ! which udownload > /dev/null 2>&1; then
-#     echo You needs the \"udownload\" utility to run.
-#     echo Get it from https://raw.githubusercontent.com/danilocgsilva/universal_download/master/programfiles/udownload
-#     exit.
-# fi
 
-# Function definition
+
+##
+# Check for download method available in the system.
+#
 local_universal_download() {
   if [ -z $1 ]; then
     echo Please, provides the first argument to be the resource address.
     exit
   fi
 
-  if which wget > /dev/null 2>&1 ; then
+  if [ $wget_exists = 1 ] ; then
       wget $1
-  elif which curl > /dev/null; then
+  elif [ $curl_exists = 1 ] ; then
       curl -O $1
   else
       echo Neither wget or curl are installed in the system. Can not download. Installs one of those.
@@ -25,20 +22,28 @@ local_universal_download() {
 }
 
 
+##
 # Check if the first argument was provided
+#
 if [ -z $1 ]; then
     echo It needs the first parameter to be the uri to download.
     exit
 fi
 
+
+##
 # Check if the target directory exists
+#
 if ! [ -d /usr/local/bin ]; then
   echo Unix system needs the /usr/local/bin to put the downloaded file, but it seems that this directory not exists.
   echo exiting...
   exit 1
 fi
 
+
+##
 # Check if there are permission to write in the /usr/local/bin
+#
 if ! [ -w /usr/local/bin ]; then
   echo There\'s no permission to write to the /usr/local/bin. Maybe execute the script as super user works.
   echo exiting...
@@ -46,19 +51,62 @@ if ! [ -w /usr/local/bin ]; then
 fi
 
 
-## Starts the script jobs
+##
+# Checks the existence of downloading utilities
+#
+wget_exists=0
+curl_exists=0
+
+if which wget > /dev/null 2>&1 ; then
+  wget_exists=1
+fi
+
+if which curl > /dev/null 2>&1; then
+  curl_exists=1
+fi
+
+##
+# Check for response code from provided uri
+#
+if [ $wget_exists = 1 ]; then
+  responsecode=$(wget --spider -S $1 2>&1 | grep "HTTP/" | awk '{print $2}')
+elif [ $curl_exists = 1 ]; then
+  responsecode=$(curl -s -o /dev/null -w "%{http_code}" $1)
+else
+  echo Sorry, could not test the uri. Neither curl or wget found in the system.
+  exit
+fi
+
+if [ $responsecode = 404 ]; then
+  echo Check for the provided resource. Not found returned.
+  exit
+fi
+
+##
+# Script execution
+#
 date=$(date +%Y%m%d-%Hh%Mm%Ss)
+
 tmp_folder=tmp_installfromuri-$date
+
 cd /tmp
+
 mkdir $tmp_folder
+
 cd $tmp_folder
+
 local_universal_download $1
+
 if [ $? -ne 0 ]; then
   echo Download failed. Check for internet connection or if the uri resource exists.
   echo exiting...
   exit
 fi
+
 file=$(ls)
+
 chmod +x $file
+
 cp $file /usr/local/bin
+
 echo Installed successfully.
