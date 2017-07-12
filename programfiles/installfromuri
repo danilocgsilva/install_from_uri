@@ -78,7 +78,7 @@ else
 fi
 
 if [ $responsecode = 404 ]; then
-  echo Check for the provided resource. Not found returned.
+  echo Check for the provided resource. Not found returned for $1.
   exit
 fi
 
