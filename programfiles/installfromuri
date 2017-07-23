@@ -65,6 +65,7 @@ if which curl > /dev/null 2>&1; then
   curl_exists=1
 fi
 
+
 ##
 # Check for response code from provided uri
 #
@@ -80,6 +81,30 @@ fi
 if [ $responsecode = 404 ]; then
   echo Check for the provided resource. Not found returned for $1.
   exit
+fi
+
+
+##
+# Check for current system. Unix-like or Windows host.
+#
+shopt -s nocasematch
+
+if [[ $(uname) =~ cygwin ]]; then
+  systemenvironment=windows
+else
+  systemenvironment=unixlike
+fi
+
+
+##
+# If it is running in Windows, it MUST have the dos2unix utility to normalize end lines after installing
+#
+if [ $systemenvironment = windows ]; then
+  if ! which dos2unix > /dev/null 2>&1 ; then
+    echo It seems that you are running the shell in a Windows.
+    echo It MUST have the dos2unix utility installed in this circunstance.
+    exit
+  fi
 fi
 
 ##
@@ -104,6 +129,10 @@ if [ $? -ne 0 ]; then
 fi
 
 file=$(ls)
+
+if [ $systemenvironment = windows ]; then
+  dos2unix $file
+fi
 
 chmod +x $file
 
