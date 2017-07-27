@@ -138,9 +138,9 @@ chmod +x $file
 
 if [ -f /usr/local/bin/$file ]; then
   rm /usr/local/bin/$file
-  echo The utility will be updated.
+  echo $file: The utility will be updated.
 else
-  echo The utility will be installed.
+  echo $file: The utility will be installed.
 fi
 
 cp $file /usr/local/bin
